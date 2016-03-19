@@ -1,0 +1,44 @@
+<!doctype html><!--HTML5文档类型声明-->
+<html>
+<head>
+<meta charset="utf-8">
+<title>这里是标题</title>
+</head>
+<style type="text/css">
+/*
+少许样式使效果更明显
+*/
+body{background: lightgray;min-height: 600px;}
+div{border: 1px solid blue;padding: 10px 0;}
+p{background: red}
+</style>
+<body>
+	<div id="eventContainer">
+		<div><p>哈哈，this is a paragraph</p></div>
+		<div><p>this is second paragraph</p></div>
+	</div>
+<script>
+//事件流：捕获阶段->目标节点->冒泡阶段
+//从DOM最外层节点捕获，沿最短路径向 目标节点 遍历，此为捕获阶段；再从目标节点，沿DOM树上溯到最外层节点，此为冒泡阶段。
+var eventContainer=document.getElementById('eventContainer');
+eventContainer.addEventListener('click',function(){alert(this.id);});
+eventContainer.firstElementChild.addEventListener(//firstElementChild根据W3C规范，返回第一个子元素节点
+	'click',
+	function(){ alert(this);event.stopPropagation();/*阻止事件冒泡，，冒泡阶段经过的元素上绑定的事件均不会执行*/},
+	true//useCapture参数(是否在捕获阶段执行，默认false即不在捕获阶段而在冒泡阶段执行)，true指定事件在捕获阶段执行
+	);//上面event.stopPropagation()、true同时设置时，子元素的绑定事件将不再执行
+eventContainer.firstElementChild.firstElementChild.addEventListener('click',function(){alert(this);});
+
+eventContainer.firstElementChild.nextElementSibling.addEventListener(//eventContainer的第一个子元素的下一个兄弟元素，也就是eventContainer的第二个子元素
+	'click',
+	function(){ alert(this);},
+	true//点击div1上的P元素，此处的事件先触发，再触发P元素上的事件。
+	);
+document.getElementsByTagName('p')[1].addEventListener(
+	'click',
+	function(){alert(this);/*事件最终被P捕获，再依次冒泡到div(绑定的事件已在捕获阶段最先执行)、#eventContainer(绑定的事件会被执行)*/}
+	);
+
+</script>
+</body>
+</html>
